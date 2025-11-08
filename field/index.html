@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIELD STUDIO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 300;
+            background-color: #000;
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            padding: 3rem;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        main {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        section {
+            position: absolute;
+            font-size: 1rem;
+            font-weight: 300;
+            white-space: nowrap;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .header-title {
+            font-weight: 400;
+            font-size: 2rem;
+            letter-spacing: 0.1em;
+            position: relative;
+            display: inline-block;
+            z-index: 1;
+        }
+
+        .header-title-wrapper {
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+        }
+
+        .header-title-wrapper:hover .cloud {
+            animation-play-state: running;
+        }
+
+        .cloud {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+            mix-blend-mode: screen;
+            animation: cloudPass 8s infinite;
+            animation-play-state: paused;
+            opacity: 0;
+        }
+
+        .header-title-wrapper:hover .cloud {
+            opacity: 1;
+        }
+
+        .cloud-1 {
+            width: 120px;
+            height: 60px;
+            background: rgba(200, 200, 220, 0.3);
+            top: -20px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+
+        .cloud-2 {
+            width: 100px;
+            height: 50px;
+            background: rgba(173, 216, 230, 0.25);
+            top: 10px;
+            left: -150px;
+            animation-delay: 1.5s;
+        }
+
+        .cloud-3 {
+            width: 140px;
+            height: 70px;
+            background: rgba(255, 255, 200, 0.2);
+            top: -10px;
+            left: -150px;
+            animation-delay: 3s;
+        }
+
+        .cloud-4 {
+            width: 90px;
+            height: 45px;
+            background: rgba(180, 180, 200, 0.35);
+            top: 20px;
+            left: -150px;
+            animation-delay: 4.5s;
+        }
+
+        .cloud-5 {
+            width: 110px;
+            height: 55px;
+            background: rgba(200, 220, 255, 0.28);
+            top: -5px;
+            left: -150px;
+            animation-delay: 6s;
+        }
+
+        @keyframes cloudPass {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(400px) translateY(0);
+                opacity: 0;
+            }
+        }
+
+        .label {
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            display: inline;
+        }
+
+        .description {
+            display: inline;
+            font-weight: 300;
+        }
+
+        .link {
+            display: inline;
+            font-size: 0.9rem;
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .link:hover {
+            color: #aaa;
+        }
+
+        section:nth-child(1) {
+            top: 22%;
+            left: 15%;
+        }
+
+        section:nth-child(2) {
+            top: 35%;
+            right: 10%;
+        }
+
+        section:nth-child(3) {
+            top: 50%;
+            left: 12%;
+        }
+
+        section:nth-child(4) {
+            bottom: 30%;
+            right: 15%;
+        }
+
+        section:nth-child(5) {
+            bottom: 40%;
+            left: 18%;
+        }
+
+        section:nth-child(6) {
+            top: 62%;
+            right: 12%;
+        }
+
+        section:nth-child(7) {
+            bottom: 15%;
+            left: 25%;
+        }
+
+        section:nth-child(8) {
+            top: 12%;
+            right: 20%;
+        }
+
+
+        @media (max-width: 600px) {
+            body {
+                padding: 2rem 1rem;
+            }
+            
+            .header-title {
+                font-size: 1.5rem;
+            }
+            
+            section {
+                font-size: 0.9rem;
+                position: relative;
+                top: auto;
+                left: auto;
+                right: auto;
+                bottom: auto;
+                transform: none;
+                margin-bottom: 2rem;
+            }
+            
+            main {
+                position: relative;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <main>
+            <section>
+                <span class="description">post analog</span>
+                <a href="https://www.instagram.com/bndindony/" class="link">instagram.com/bndindony</a>
+                <span class="label">FIELD</span>
+            </section>
+            
+            <section>
+                <a href="https://www.pinterest.com/sebastian_tellmann/" class="link">pinterest.com/sebastian_tellmann</a>
+                <span class="label">IMAGE</span>
+            </section>
+            
+            <section>
+                <a href="https://brikayeeye.github.io/games/" class="link">brikayeeye.github.io/games</a>
+                <span class="label">PLAY</span>
+            </section>
+            
+            <section>
+                <a href="https://medium.com/@bk_89765" class="link">medium.com/@bk_89765</a>
+                <span class="label">WORD</span>
+            </section>
+            
+            <section>
+                <span class="description">feel smth? reach out..</span>
+                <span class="label">COLAB</span>
+            </section>
+            
+            <section>
+                <a href="https://www.etsy.com/shop/gothicarising/?etsrc=sdt" class="link">etsy.com/shop/gothicarising</a>
+                <span class="label">SUPPORT A STARVING ARTIST</span>
+            </section>
+            
+            <section>
+                <span class="label">ABOUT</span>
+                <span class="description">you tell me</span>
+            </section>
+            
+            <section>
+                <span class="header-title-wrapper">
+                    <span class="cloud cloud-1"></span>
+                    <span class="cloud cloud-2"></span>
+                    <span class="cloud cloud-3"></span>
+                    <span class="cloud cloud-4"></span>
+                    <span class="cloud cloud-5"></span>
+                    <span class="header-title">FIELD STUDIO</span>
+                </span>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+
