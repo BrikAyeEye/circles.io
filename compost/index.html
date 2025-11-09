@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compost Archive â€” Closures</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="page-header">
+        <div class="header-left">
+            <h1 class="archive-title">Compost Archive</h1>
+            <p class="archive-subtitle">closures</p>
+        </div>
+        <button class="btn-new" id="btnNew" aria-label="Add a new closure">+ New Closure</button>
+    </header>
+
+    <main class="main-content">
+        <div class="tiles-grid" id="tilesGrid" role="grid">
+            <!-- Tiles will be dynamically inserted here -->
+        </div>
+        <div class="empty-state" id="emptyState" aria-live="polite">
+            <div class="empty-glyph">
+                <div class="empty-glyph-circle"></div>
+                <div class="empty-glyph-eye"></div>
+            </div>
+            <p>No closures archived yet. Click <strong>+ New Closure</strong> to begin.</p>
+        </div>
+    </main>
+
+    <!-- New Closure Modal -->
+    <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+        <div class="modal-content">
+            <h2 id="modalTitle" class="modal-title">Add a Closure</h2>
+            <form id="closureForm" class="closure-form">
+                <div class="form-group">
+                    <label for="inputTitle">Title</label>
+                    <input type="text" id="inputTitle" name="title" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="inputDate">Date</label>
+                    <input type="date" id="inputDate" name="date" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="inputReflection">Reflection (one line)</label>
+                    <textarea id="inputReflection" name="reflection" maxlength="200" rows="3" required aria-required="true"></textarea>
+                    <span class="char-count"><span id="charCount">0</span>/200</span>
+                </div>
+                <div class="form-group">
+                    <label for="inputMedia">Upload image/video</label>
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <input type="file" id="inputMedia" name="media" accept="image/jpeg,image/png,image/webp,video/mp4" aria-label="Upload image or video">
+                        <div class="file-upload-text">
+                            <span>Drag & drop or click to select</span>
+                            <span class="file-types">.jpg, .png, .webp, .mp4</span>
+                        </div>
+                    </div>
+                    <div class="media-preview" id="mediaPreview" hidden></div>
+                </div>
+                <div class="form-group">
+                    <label for="inputLink">Optional link</label>
+                    <input type="url" id="inputLink" name="link" placeholder="https://example.com/longer-note">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="btnSaveDraft">Save Draft</button>
+                    <button type="button" class="btn-secondary" id="btnExportJSON">Export JSON</button>
+                    <button type="button" class="btn-secondary" id="btnAddTemp">Add to Page (temp)</button>
+                    <button type="button" class="btn-close" id="btnCloseModal">Close</button>
+                </div>
+                <p class="form-note">This site is static. Export JSON and commit media to persist.</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div class="lightbox-overlay" id="lightboxOverlay" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" hidden>
+        <button class="lightbox-close" id="lightboxClose" aria-label="Close lightbox">Ã—</button>
+        <div class="lightbox-content">
+            <div class="lightbox-media" id="lightboxMedia"></div>
+            <div class="lightbox-info">
+                <h3 id="lightboxTitle" class="lightbox-title"></h3>
+                <p class="lightbox-date" id="lightboxDate"></p>
+                <p class="lightbox-reflection" id="lightboxReflection"></p>
+                <a id="lightboxLink" class="lightbox-link" href="#" target="_blank" rel="noopener" hidden>View longer note</a>
+            </div>
+            <div class="lightbox-actions">
+                <button class="btn-secondary" id="btnDownloadJSON">Download entry JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
