@@ -1,0 +1,208 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background-color: #000;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.6;
+}
+
+.screen {
+    display: none;
+    width: 100%;
+    max-width: 800px;
+    padding: 2rem;
+}
+
+.screen.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.content {
+    width: 100%;
+    text-align: center;
+}
+
+/* Welcome Screen */
+#welcome-screen h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: normal;
+    letter-spacing: 0.1em;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.btn {
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-family: 'Georgia', serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.05em;
+}
+
+.btn:hover {
+    background: #fff;
+    color: #000;
+}
+
+/* Journey Screen */
+#journey-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.section {
+    width: 100%;
+}
+
+.section.hidden {
+    display: none;
+}
+
+/* Typography */
+h2 {
+    font-size: 1.8rem;
+    font-weight: normal;
+    margin-bottom: 2rem;
+    letter-spacing: 0.05em;
+}
+
+.dialogue-line {
+    font-size: 1.2rem;
+    margin: 1.5rem 0;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.dialogue-line.visible {
+    opacity: 1;
+}
+
+.dialogue-line.fade-out {
+    opacity: 0;
+}
+
+.speaker-name {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    opacity: 0.9;
+    letter-spacing: 0.05em;
+}
+
+.dialogue-text {
+    font-size: 1.2rem;
+    line-height: 1.8;
+}
+
+.system-question {
+    font-size: 1.3rem;
+    font-style: italic;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    border-left: 2px solid #fff;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.system-question.visible {
+    opacity: 1;
+}
+
+/* Scene Header */
+#scene-header {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    opacity: 0.7;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* Reflection Section */
+#reflection-section {
+    margin-top: 3rem;
+}
+
+#reflection-question {
+    font-size: 1.3rem;
+    font-style: italic;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+}
+
+#reflection-input {
+    width: 100%;
+    max-width: 600px;
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 1rem;
+    font-family: 'Georgia', serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    resize: vertical;
+    margin-bottom: 1.5rem;
+}
+
+#reflection-input:focus {
+    outline: none;
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+#reflection-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Outro */
+#outro-messages {
+    font-size: 1.2rem;
+    line-height: 2;
+}
+
+.outro-line {
+    margin: 1rem 0;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.outro-line.visible {
+    opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    #welcome-screen h1 {
+        font-size: 2rem;
+    }
+    
+    .dialogue-text {
+        font-size: 1.1rem;
+    }
+    
+    .system-question {
+        font-size: 1.1rem;
+    }
+}
+

@@ -1,0 +1,33 @@
+{
+  "2nd": {
+    "name": "The Steward",
+    "themes": ["resources", "worth", "value", "security", "possessions"],
+    "voice": "grounded, practical, concerned with stability"
+  },
+  "6th": {
+    "name": "The Artisan",
+    "themes": ["work", "craft", "routine", "service", "health"],
+    "voice": "methodical, dedicated, seeking mastery through practice"
+  },
+  "10th": {
+    "name": "The Architect",
+    "themes": ["career", "public image", "ambition", "legacy", "authority"],
+    "voice": "ambitious, structured, focused on building something lasting"
+  },
+  "8th": {
+    "name": "The Alchemist",
+    "themes": ["transformation", "shared resources", "intimacy", "regeneration"],
+    "voice": "deep, transformative, unafraid of intensity"
+  },
+  "11th": {
+    "name": "The Visionary",
+    "themes": ["community", "friendship", "hopes", "innovation", "collective"],
+    "voice": "forward-thinking, collaborative, idealistic"
+  },
+  "5th": {
+    "name": "The Creator",
+    "themes": ["creativity", "play", "self-expression", "joy", "romance"],
+    "voice": "expressive, joyful, unapologetically authentic"
+  }
+}
+

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Houses Journey</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div id="welcome-screen" class="screen active">
+        <div class="content">
+            <h1>✨ The Houses Journey ✨</h1>
+            <p class="subtitle">A reflective exploration through astrological houses</p>
+            <button id="begin-btn" class="btn">Begin Journey</button>
+        </div>
+    </div>
+
+    <!-- Journey Screen -->
+    <div id="journey-screen" class="screen">
+        <div class="content">
+            <!-- Intro Section -->
+            <div id="intro-section" class="section">
+                <h2 id="intro-title"></h2>
+                <div id="intro-messages"></div>
+            </div>
+
+            <!-- Dialogue Section -->
+            <div id="dialogue-section" class="section hidden">
+                <div id="scene-header"></div>
+                <div id="dialogue-lines"></div>
+            </div>
+
+            <!-- Reflection Section -->
+            <div id="reflection-section" class="section hidden">
+                <div id="reflection-question"></div>
+                <textarea id="reflection-input" placeholder="Type your reflection here..." rows="4"></textarea>
+                <button id="save-reflection-btn" class="btn">Save</button>
+            </div>
+
+            <!-- Outro Section -->
+            <div id="outro-section" class="section hidden">
+                <div id="outro-messages"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,78 @@
+[
+  {
+    "pair": ["2nd", "6th"],
+    "lines": [
+      {
+        "speaker": "2nd",
+        "text": "I like steadiness; security lets me breathe."
+      },
+      {
+        "speaker": "6th",
+        "text": "And yet, routine dulls my craft."
+      },
+      {
+        "speaker": "2nd",
+        "text": "But what is craft without the foundation to sustain it?"
+      },
+      {
+        "speaker": "6th",
+        "text": "Perhaps the craft itself becomes the foundation."
+      },
+      {
+        "speaker": "system",
+        "text": "When has security started to feel like boredom for you?"
+      }
+    ]
+  },
+  {
+    "pair": ["2nd", "10th"],
+    "lines": [
+      {
+        "speaker": "2nd",
+        "text": "I measure value in what endures."
+      },
+      {
+        "speaker": "10th",
+        "text": "I measure value in what others see."
+      },
+      {
+        "speaker": "2nd",
+        "text": "But what if what endures is invisible?"
+      },
+      {
+        "speaker": "10th",
+        "text": "Then it must be made visible. That is my work."
+      },
+      {
+        "speaker": "system",
+        "text": "Where do you feel the tension between inner worth and outer recognition?"
+      }
+    ]
+  },
+  {
+    "pair": ["2nd", "8th"],
+    "lines": [
+      {
+        "speaker": "2nd",
+        "text": "I hold what is mine, carefully."
+      },
+      {
+        "speaker": "8th",
+        "text": "I invite you to release what no longer serves."
+      },
+      {
+        "speaker": "2nd",
+        "text": "Release? That feels like loss."
+      },
+      {
+        "speaker": "8th",
+        "text": "Loss is transformation. What you release becomes something else."
+      },
+      {
+        "speaker": "system",
+        "text": "What are you holding onto that might be ready to transform?"
+      }
+    ]
+  }
+]
+
