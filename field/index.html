@@ -250,6 +250,11 @@
         let isHovering = false;
         let isFinishing = false;
         let activeClouds = new Set();
+        
+        // Ensure elements are found
+        if (!wrapper || clouds.length === 0) {
+            console.error('Cloud elements not found!');
+        }
 
         // Track animation end for all clouds
         clouds.forEach((cloud) => {
@@ -286,17 +291,22 @@
             // Safety check: if no active clouds, we're not really finishing
             if (activeClouds.size === 0) {
                 isFinishing = false;
+                wrapper.classList.remove('finishing');
             }
             
-            if (!isFinishing) {
+            // Always allow hover if not actively finishing (has active clouds)
+            if (!isFinishing || activeClouds.size === 0) {
                 isHovering = true;
                 // Clear any leftover state and inline styles from previous session
                 activeClouds.clear();
                 clouds.forEach(cloud => {
-                    cloud.style.animationPlayState = '';
-                    cloud.style.opacity = '';
+                    // Remove inline styles to let CSS take over
+                    cloud.style.removeProperty('animation-play-state');
+                    cloud.style.removeProperty('opacity');
+                    cloud.style.removeProperty('animation');
                     cloud.classList.remove('animating');
                 });
+                // Add hovering class - this should make clouds appear via CSS
                 wrapper.classList.add('hovering');
             }
         });
