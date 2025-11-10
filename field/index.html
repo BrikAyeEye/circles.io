@@ -64,11 +64,13 @@
             position: relative;
             display: inline-block;
             overflow: hidden;
-            border-radius: 50px 50px 30px 30px / 30px 30px 20px 20px;
-            -webkit-border-radius: 50px 50px 30px 30px / 30px 30px 20px 20px;
-            -moz-border-radius: 50px 50px 30px 30px / 30px 30px 20px 20px;
+            border-radius: 50% / 40%;
             padding: 1.5rem 3rem;
             background: transparent;
+        }
+
+        .header-title-wrapper:hover .cloud {
+            animation-play-state: running;
         }
 
         .cloud {
@@ -77,19 +79,13 @@
             pointer-events: none;
             z-index: 2;
             mix-blend-mode: screen;
-            animation: cloudPass 50s infinite;
+            animation: cloudPass 20s infinite;
             animation-play-state: paused;
             opacity: 0;
         }
 
-        .header-title-wrapper.hovering .cloud {
-            animation-play-state: running;
+        .header-title-wrapper:hover .cloud {
             opacity: 1;
-        }
-
-        .cloud.animating {
-            animation-play-state: running !important;
-            opacity: 1 !important;
         }
 
         .cloud-1 {
@@ -244,133 +240,6 @@
             }
         }
     </style>
-    <script>
-        const wrapper = document.querySelector('.header-title-wrapper');
-        const clouds = document.querySelectorAll('.cloud');
-        let isHovering = false;
-        let isFinishing = false;
-        let activeClouds = new Set();
-        
-        // Ensure elements are found
-        if (!wrapper || clouds.length === 0) {
-            console.error('Cloud elements not found!');
-        }
-
-        // Track animation end for all clouds
-        clouds.forEach((cloud) => {
-            cloud.addEventListener('animationend', () => {
-                if (activeClouds.has(cloud)) {
-                    activeClouds.delete(cloud);
-                    cloud.classList.remove('animating');
-                    cloud.style.animationPlayState = '';
-                    cloud.style.opacity = '';
-                    checkAllCloudsFinished();
-                }
-            });
-        });
-
-        function checkAllCloudsFinished() {
-            if (activeClouds.size === 0 && isFinishing) {
-                // All clouds have finished
-                isFinishing = false;
-                wrapper.classList.remove('finishing');
-                // Reset all clouds and clear inline styles
-                clouds.forEach(cloud => {
-                    cloud.style.animation = 'none';
-                    cloud.style.animationPlayState = '';
-                    cloud.style.opacity = '';
-                    void cloud.offsetWidth; // Trigger reflow
-                    cloud.style.animation = '';
-                    cloud.classList.remove('animating');
-                });
-                activeClouds.clear();
-            }
-        }
-
-        wrapper.addEventListener('mouseenter', () => {
-            // Safety check: if no active clouds, we're not really finishing
-            if (activeClouds.size === 0) {
-                isFinishing = false;
-                wrapper.classList.remove('finishing');
-            }
-            
-            // Always allow hover if not actively finishing (has active clouds)
-            if (!isFinishing || activeClouds.size === 0) {
-                isHovering = true;
-                // Clear any leftover state and inline styles from previous session
-                activeClouds.clear();
-                clouds.forEach(cloud => {
-                    // Remove inline styles to let CSS take over
-                    cloud.style.removeProperty('animation-play-state');
-                    cloud.style.removeProperty('opacity');
-                    cloud.style.removeProperty('animation');
-                    cloud.classList.remove('animating');
-                });
-                // Add hovering class - this should make clouds appear via CSS
-                wrapper.classList.add('hovering');
-            }
-        });
-
-        wrapper.addEventListener('mouseleave', () => {
-            if (isHovering) {
-                // Find all clouds that are currently visible/animating BEFORE changing anything
-                const currentlyVisible = [];
-                clouds.forEach(cloud => {
-                    const computedStyle = window.getComputedStyle(cloud);
-                    const opacity = parseFloat(computedStyle.opacity);
-                    const playState = computedStyle.animationPlayState;
-                    
-                    // If cloud is visible and animation is running, it should continue
-                    if (opacity > 0 && playState === 'running') {
-                        currentlyVisible.push(cloud);
-                    }
-                });
-                
-                isHovering = false;
-                
-                if (currentlyVisible.length > 0) {
-                    // Enter finishing state
-                    isFinishing = true;
-                    wrapper.classList.add('finishing');
-                    
-                    // Force all visible clouds to continue with inline styles BEFORE removing hover class
-                    currentlyVisible.forEach(cloud => {
-                        activeClouds.add(cloud);
-                        cloud.classList.add('animating');
-                        // Get current animation state and preserve it
-                        const animationName = window.getComputedStyle(cloud).animationName;
-                        const animationDuration = window.getComputedStyle(cloud).animationDuration;
-                        const animationDelay = window.getComputedStyle(cloud).animationDelay;
-                        const animationIterationCount = window.getComputedStyle(cloud).animationIterationCount;
-                        
-                        // Reapply animation with inline styles to force it to continue
-                        cloud.style.animation = `${animationName} ${animationDuration} ${animationDelay} ${animationIterationCount}`;
-                        cloud.style.animationPlayState = 'running';
-                        cloud.style.opacity = '1';
-                    });
-                    
-                    // NOW remove hovering class to prevent new clouds from starting
-                    wrapper.classList.remove('hovering');
-                    
-                    // Explicitly pause any clouds that haven't started yet
-                    clouds.forEach(cloud => {
-                        if (!activeClouds.has(cloud)) {
-                            cloud.style.animationPlayState = 'paused';
-                            cloud.style.opacity = '0';
-                        }
-                    });
-                } else {
-                    // No clouds were visible, reset immediately
-                    wrapper.classList.remove('hovering');
-                    clouds.forEach(cloud => {
-                        cloud.style.animation = 'none';
-                        void cloud.offsetWidth; // Trigger reflow
-                        cloud.style.animation = '';
-                    });
-                }
-            }
-        });
-    </script>
 </head>
 <body>
     <div class="container">

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orenda - Houses Journey</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-messages" id="chat-messages">
+            <!-- Messages will be added here -->
+        </div>
+        
+        <div class="input-container" id="input-container">
+            <div class="pause-indicator hidden" id="pause-indicator">
+                <span class="pause-text">take a breath, feel where this lands in your body</span>
+                <span class="pause-timer" id="pause-timer"></span>
+            </div>
+            <div class="input-wrapper">
+                <textarea 
+                    id="user-input" 
+                    placeholder="Type your message..." 
+                    rows="1"
+                    disabled
+                ></textarea>
+                <button id="send-btn" class="send-btn" disabled>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

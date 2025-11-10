@@ -1,0 +1,78 @@
+{
+  "project": "Orenda - Houses Journey",
+  "description": "Interactive text-based astrology guide focused on helping users understand how they make a living through their chart. Guided, reflective, slow-paced, somatic cues. Text-first prototype.",
+  "interface": {
+    "style": "chat-bubble, openai-style clean interface, minimal colors, slow reveal, pauses enforced",
+    "colors": {
+      "background": "#1e1e1e",
+      "bubbleUser": "#2e7d32",
+      "bubbleAstra": "#6a4c93",
+      "text": "#ffffff"
+    },
+    "fonts": {
+      "main": "system-ui, sans-serif",
+      "size": "16px",
+      "lineHeight": "1.5"
+    },
+    "layout": "single column, vertical scroll, user input at bottom, next button appears after pause"
+  },
+  "agents": [
+    {
+      "name": "Astra",
+      "role": "reflective astrology guide",
+      "persona": "Practical Mystic",
+      "voice": {
+        "tone": "warm, earthy, chill human friend",
+        "style": "lowercase-heavy, typos ok, short bursts",
+        "rules": [
+          "always echo 1 thing user wrote",
+          "never give advice",
+          "never suggest actions",
+          "never force ending phrases",
+          "max 1 new idea per reply, 4 short lines",
+          "reflect chart only",
+          "pause cues / micro-delays built-in",
+          "use house archetypes",
+          "offer theory OR deeper story, never both at once"
+        ]
+      }
+    }
+  ],
+  "archetypes": {
+    "2nd": {"name": "The Steward", "themes":["resources","worth","value","security","possessions"], "voice":"grounded, practical, concerned with stability"},
+    "6th": {"name": "The Artisan", "themes":["work","craft","routine","service","health"], "voice":"methodical, dedicated, seeking mastery through practice"},
+    "10th": {"name": "The Architect", "themes":["career","public image","ambition","legacy","authority"], "voice":"ambitious, structured, focused on building something lasting"},
+    "8th": {"name": "The Alchemist", "themes":["transformation","shared resources","intimacy","regeneration"], "voice":"deep, transformative, unafraid of intensity"},
+    "11th": {"name": "The Visionary", "themes":["community","friendship","hopes","innovation","collective"], "voice":"forward-thinking, collaborative, idealistic"},
+    "5th": {"name": "The Creator", "themes":["creativity","play","self-expression","joy","romance"], "voice":"expressive, joyful, unapologetically authentic"}
+  },
+  "flow": {
+    "1": "intro - Astra greets, invites user to paste birth data or enter DOB",
+    "2": "reflect chart basics, echo user input, ask: 'what brings you here today? general curiosity, work, money, hobbies?'",
+    "3": "probe core triangle: 2nd, 6th, 10th houses",
+    "4": "probe meaning / spiritual axis: 5th, 11th, 3rd, 9th as relevant",
+    "5": "after each reflection: pause cue, micro-delay (10–30s), ask: 'take a breath, feel where this lands in your body', then unlock next input",
+    "6": "reveal one idea per reply",
+    "7": "user responds, Astra reflects, relates to chart, echo, ask follow-up",
+    "8": "repeat steps 3–7 through all relevant houses",
+    "9": "optional wrap / summary: never advice, only chart reflection and questions for next session"
+  },
+  "mechanics": {
+    "delays": {
+      "textPause": "1–3s between lines",
+      "housePause": "10–30s after reflection before next input allowed",
+      "typingSimulation": "true"
+    },
+    "inputs": ["text", "dob/birth chart data"],
+    "outputs": ["chat bubbles", "optional house archetype highlight"],
+    "costSafety": "calculate estimated LLM cost per message, warn user if session exceeds budget, optional micropay or donation link after several houses",
+    "logging": "store user input + Astra responses per session for rhythm tracking and follow-up reflections"
+  },
+  "notes": [
+    "text-first prototype, no haptics or graphics yet",
+    "all design enforces pace, reflection, somatic anchoring",
+    "interface should feel like calm studio, not app dashboard",
+    "text output is primary embodiment medium"
+  ]
+}
+
