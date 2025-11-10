@@ -288,56 +288,61 @@
 
         wrapper.addEventListener('mouseleave', () => {
             if (isHovering) {
-                isHovering = false;
-                
-                // Use requestAnimationFrame to ensure we capture state before removing class
-                requestAnimationFrame(() => {
-                    // Find all clouds that are currently visible/animating
-                    const currentlyVisible = [];
-                    clouds.forEach(cloud => {
-                        const computedStyle = window.getComputedStyle(cloud);
-                        const opacity = parseFloat(computedStyle.opacity);
-                        const playState = computedStyle.animationPlayState;
-                        
-                        // If cloud is visible and animation is running, it should continue
-                        if (opacity > 0 && playState === 'running') {
-                            currentlyVisible.push(cloud);
-                        }
-                    });
+                // Find all clouds that are currently visible/animating BEFORE changing anything
+                const currentlyVisible = [];
+                clouds.forEach(cloud => {
+                    const computedStyle = window.getComputedStyle(cloud);
+                    const opacity = parseFloat(computedStyle.opacity);
+                    const playState = computedStyle.animationPlayState;
                     
-                    if (currentlyVisible.length > 0) {
-                        // Enter finishing state
-                        isFinishing = true;
-                        wrapper.classList.add('finishing');
-                        
-                        // Force all visible clouds to continue with inline styles
-                        currentlyVisible.forEach(cloud => {
-                            activeClouds.add(cloud);
-                            cloud.classList.add('animating');
-                            // Get current animation state and preserve it
-                            const animationName = window.getComputedStyle(cloud).animationName;
-                            const animationDuration = window.getComputedStyle(cloud).animationDuration;
-                            const animationDelay = window.getComputedStyle(cloud).animationDelay;
-                            const animationIterationCount = window.getComputedStyle(cloud).animationIterationCount;
-                            
-                            // Reapply animation with inline styles to force it to continue
-                            cloud.style.animation = `${animationName} ${animationDuration} ${animationDelay} ${animationIterationCount}`;
-                            cloud.style.animationPlayState = 'running';
-                            cloud.style.opacity = '1';
-                        });
-                        
-                        // Now remove hovering class
-                        wrapper.classList.remove('hovering');
-                    } else {
-                        // No clouds were visible, reset immediately
-                        wrapper.classList.remove('hovering');
-                        clouds.forEach(cloud => {
-                            cloud.style.animation = 'none';
-                            void cloud.offsetWidth; // Trigger reflow
-                            cloud.style.animation = '';
-                        });
+                    // If cloud is visible and animation is running, it should continue
+                    if (opacity > 0 && playState === 'running') {
+                        currentlyVisible.push(cloud);
                     }
                 });
+                
+                isHovering = false;
+                
+                if (currentlyVisible.length > 0) {
+                    // Enter finishing state
+                    isFinishing = true;
+                    wrapper.classList.add('finishing');
+                    
+                    // Force all visible clouds to continue with inline styles BEFORE removing hover class
+                    currentlyVisible.forEach(cloud => {
+                        activeClouds.add(cloud);
+                        cloud.classList.add('animating');
+                        // Get current animation state and preserve it
+                        const animationName = window.getComputedStyle(cloud).animationName;
+                        const animationDuration = window.getComputedStyle(cloud).animationDuration;
+                        const animationDelay = window.getComputedStyle(cloud).animationDelay;
+                        const animationIterationCount = window.getComputedStyle(cloud).animationIterationCount;
+                        
+                        // Reapply animation with inline styles to force it to continue
+                        cloud.style.animation = `${animationName} ${animationDuration} ${animationDelay} ${animationIterationCount}`;
+                        cloud.style.animationPlayState = 'running';
+                        cloud.style.opacity = '1';
+                    });
+                    
+                    // NOW remove hovering class to prevent new clouds from starting
+                    wrapper.classList.remove('hovering');
+                    
+                    // Explicitly pause any clouds that haven't started yet
+                    clouds.forEach(cloud => {
+                        if (!activeClouds.has(cloud)) {
+                            cloud.style.animationPlayState = 'paused';
+                            cloud.style.opacity = '0';
+                        }
+                    });
+                } else {
+                    // No clouds were visible, reset immediately
+                    wrapper.classList.remove('hovering');
+                    clouds.forEach(cloud => {
+                        cloud.style.animation = 'none';
+                        void cloud.offsetWidth; // Trigger reflow
+                        cloud.style.animation = '';
+                    });
+                }
             }
         });
     </script>
