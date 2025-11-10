@@ -269,19 +269,34 @@
                 // All clouds have finished
                 isFinishing = false;
                 wrapper.classList.remove('finishing');
-                // Reset all clouds
+                // Reset all clouds and clear inline styles
                 clouds.forEach(cloud => {
                     cloud.style.animation = 'none';
+                    cloud.style.animationPlayState = '';
+                    cloud.style.opacity = '';
                     void cloud.offsetWidth; // Trigger reflow
                     cloud.style.animation = '';
                     cloud.classList.remove('animating');
                 });
+                activeClouds.clear();
             }
         }
 
         wrapper.addEventListener('mouseenter', () => {
+            // Safety check: if no active clouds, we're not really finishing
+            if (activeClouds.size === 0) {
+                isFinishing = false;
+            }
+            
             if (!isFinishing) {
                 isHovering = true;
+                // Clear any leftover state and inline styles from previous session
+                activeClouds.clear();
+                clouds.forEach(cloud => {
+                    cloud.style.animationPlayState = '';
+                    cloud.style.opacity = '';
+                    cloud.classList.remove('animating');
+                });
                 wrapper.classList.add('hovering');
             }
         });
