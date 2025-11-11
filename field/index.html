@@ -75,68 +75,61 @@
             pointer-events: none;
             z-index: 2;
             mix-blend-mode: screen;
-            animation: cloudPass 20s infinite;
-            animation-play-state: paused;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .header-title-wrapper:hover .cloud:not(.finishing) {
-            animation-play-state: running;
-            opacity: 1;
-        }
-
-        .header-title-wrapper.no-hover:hover .cloud {
-            animation-play-state: paused !important;
-            opacity: 0 !important;
-        }
-
-        .cloud-1 {
-            width: 120px;
-            height: 60px;
-            background: rgba(200, 200, 220, 0.3);
-            top: -20px;
             left: -150px;
-            animation-delay: 0s;
         }
 
-        .cloud-2 {
-            width: 100px;
-            height: 50px;
-            background: rgba(173, 216, 230, 0.25);
-            top: 10px;
-            left: -150px;
-            animation-delay: 1.5s;
+        @keyframes cloudPassSlow {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(400px) translateY(0);
+                opacity: 0;
+            }
         }
 
-        .cloud-3 {
-            width: 140px;
-            height: 70px;
-            background: rgba(255, 255, 200, 0.2);
-            top: -10px;
-            left: -150px;
-            animation-delay: 3s;
+        @keyframes cloudPassMedium {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(400px) translateY(0);
+                opacity: 0;
+            }
         }
 
-        .cloud-4 {
-            width: 90px;
-            height: 45px;
-            background: rgba(180, 180, 200, 0.35);
-            top: 20px;
-            left: -150px;
-            animation-delay: 4.5s;
+        @keyframes cloudPassFast {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(400px) translateY(0);
+                opacity: 0;
+            }
         }
 
-        .cloud-5 {
-            width: 110px;
-            height: 55px;
-            background: rgba(200, 220, 255, 0.28);
-            top: -5px;
-            left: -150px;
-            animation-delay: 6s;
-        }
-
-        @keyframes cloudPass {
+        @keyframes cloudPassVeryFast {
             0% {
                 transform: translateX(0) translateY(0);
                 opacity: 0;
@@ -249,11 +242,6 @@
         <main>
             <section class="header-section">
                 <span class="header-title-wrapper">
-                    <span class="cloud cloud-1"></span>
-                    <span class="cloud cloud-2"></span>
-                    <span class="cloud cloud-3"></span>
-                    <span class="cloud cloud-4"></span>
-                    <span class="cloud cloud-5"></span>
                     <span class="header-title">FIELD STUDIO</span>
                 </span>
             </section>
@@ -288,83 +276,99 @@
             const wrapper = document.querySelector('.header-title-wrapper');
             if (!wrapper) return;
 
-            const clouds = wrapper.querySelectorAll('.cloud');
-            let isWindingDown = false;
-            let activeClouds = new Set();
-            let resetTimeout = null;
+            // Cloud configuration
+            const sizes = [
+                { width: 90, height: 45 },   // Small
+                { width: 120, height: 60 },  // Medium
+                { width: 140, height: 70 }   // Large
+            ];
 
-            const finishCloud = (cloud) => {
-                cloud.classList.add('finishing');
-                cloud.style.opacity = '0';
-                cloud.style.animationPlayState = 'paused';
-                cloud.style.animation = 'none';
-                void cloud.offsetWidth;
-                cloud.style.animation = '';
-                activeClouds.delete(cloud);
-                cloud.classList.remove('finishing');
-                cloud.removeEventListener('animationend', onCloudEnd);
+            const speeds = [
+                { name: 'cloudPassSlow', duration: '60s' },      // Slow
+                { name: 'cloudPassMedium', duration: '40s' },   // Medium
+                { name: 'cloudPassFast', duration: '25s' },     // Fast
+                { name: 'cloudPassVeryFast', duration: '15s' }   // Very Fast
+            ];
 
-                if (activeClouds.size === 0) {
-                    endWindDown();
+            const colors = [
+                'rgba(200, 200, 220, 0.3)',
+                'rgba(173, 216, 230, 0.25)',
+                'rgba(255, 255, 200, 0.2)',
+                'rgba(180, 180, 200, 0.35)',
+                'rgba(200, 220, 255, 0.28)'
+            ];
+
+            let generatorActive = false;
+            let spawnTimeout = null;
+
+            // Random helper functions
+            const random = (min, max) => Math.random() * (max - min) + min;
+            const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+            const randomItem = (array) => array[Math.floor(Math.random() * array.length)];
+
+            // Create and spawn a cloud
+            const spawnCloud = () => {
+                const cloud = document.createElement('span');
+                cloud.className = 'cloud';
+
+                // Random properties
+                const size = randomItem(sizes);
+                const speed = randomItem(speeds);
+                const color = randomItem(colors);
+                const top = random(-30, 30); // Random vertical position
+                const delay = random(0, 1);   // Random delay (0-1s)
+
+                // Apply styles
+                cloud.style.width = `${size.width}px`;
+                cloud.style.height = `${size.height}px`;
+                cloud.style.background = color;
+                cloud.style.top = `${top}px`;
+                cloud.style.animation = `${speed.name} ${speed.duration} linear`;
+                cloud.style.animationDelay = `${delay}s`;
+                cloud.style.opacity = '1';
+
+                // Add to wrapper
+                wrapper.appendChild(cloud);
+
+                // Clean up when animation ends
+                cloud.addEventListener('animationend', () => {
+                    cloud.remove();
+                }, { once: true });
+            };
+
+            // Spawn multiple clouds (1-3 at once)
+            const spawnCloudGroup = () => {
+                const count = randomInt(1, 3);
+                for (let i = 0; i < count; i++) {
+                    spawnCloud();
                 }
             };
 
-            const onCloudEnd = (event) => {
-                finishCloud(event.target);
+            // Generator loop
+            const generatorLoop = () => {
+                if (!generatorActive) return;
+
+                spawnCloudGroup();
+
+                // Random interval between spawns (0.5s - 3s)
+                const nextSpawn = random(500, 3000);
+                spawnTimeout = setTimeout(generatorLoop, nextSpawn);
             };
 
-            const endWindDown = () => {
-                isWindingDown = false;
-                wrapper.classList.remove('no-hover');
-                if (resetTimeout) {
-                    clearTimeout(resetTimeout);
-                    resetTimeout = null;
-                }
-
-                clouds.forEach(cloud => {
-                    cloud.style.removeProperty('opacity');
-                    cloud.style.removeProperty('animation-play-state');
-                });
-
-                activeClouds.clear();
-            };
-
+            // Start generator
             wrapper.addEventListener('mouseenter', () => {
-                if (isWindingDown) {
-                    endWindDown();
-                }
-                if (resetTimeout) {
-                    clearTimeout(resetTimeout);
-                    resetTimeout = null;
-                }
+                generatorActive = true;
+                generatorLoop(); // Start immediately
             });
 
+            // Stop generator
             wrapper.addEventListener('mouseleave', () => {
-                if (isWindingDown) return;
-
-                isWindingDown = true;
-                wrapper.classList.add('no-hover');
-
-                setTimeout(() => {
-                    activeClouds.clear();
-
-                    clouds.forEach(cloud => {
-                        const computed = getComputedStyle(cloud);
-                        const isActive = computed.animationPlayState === 'running' || parseFloat(computed.opacity) > 0;
-
-                        if (isActive) {
-                            activeClouds.add(cloud);
-                            cloud.style.animationPlayState = 'running';
-                            cloud.style.opacity = '1';
-                            void cloud.offsetWidth;
-                            cloud.addEventListener('animationend', onCloudEnd, { once: true });
-                        } else {
-                            cloud.style.opacity = '0';
-                        }
-                    });
-
-                    resetTimeout = setTimeout(endWindDown, 15000);
-                }, 0);
+                generatorActive = false;
+                if (spawnTimeout) {
+                    clearTimeout(spawnTimeout);
+                    spawnTimeout = null;
+                }
+                // Existing clouds continue naturally
             });
         });
     </script>
