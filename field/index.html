@@ -64,7 +64,7 @@
             position: relative;
             display: inline-block;
             overflow: hidden;
-            border-radius: 50% / 40%;
+            border-radius: 50% 50% 40% 40% / 40% 40% 30% 30%;
             padding: 1.5rem 3rem;
             background: transparent;
         }
@@ -79,13 +79,19 @@
             pointer-events: none;
             z-index: 2;
             mix-blend-mode: screen;
-            animation: cloudPass 20s infinite;
+            animation: cloudPass 50s infinite;
             animation-play-state: paused;
             opacity: 0;
         }
 
         .header-title-wrapper:hover .cloud {
             opacity: 1;
+        }
+
+        /* Prevent re-trigger during wind-down */
+        .header-title-wrapper.no-hover:hover .cloud {
+            animation-play-state: paused !important;
+            opacity: 0 !important;
         }
 
         .cloud-1 {
@@ -240,6 +246,84 @@
             }
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('.header-title-wrapper');
+            if (!header) return;
+
+            const clouds = header.querySelectorAll('.cloud');
+            let activeClouds = new Set();
+            let resetTimeout = null;
+            let runningClouds = new Set(); // Track clouds that are actually running
+
+            const resetHoverState = () => {
+                header.classList.remove('no-hover');
+                clouds.forEach(cloud => {
+                    cloud.style.removeProperty('animation-play-state');
+                    cloud.style.removeProperty('opacity');
+                });
+                activeClouds.clear();
+                if (resetTimeout) {
+                    clearTimeout(resetTimeout);
+                    resetTimeout = null;
+                }
+            };
+
+            const handleCloudEnd = (e) => {
+                const cloud = e.target;
+                cloud.style.opacity = '0';
+                cloud.style.animationPlayState = 'paused';
+                activeClouds.delete(cloud);
+
+                if (activeClouds.size === 0) {
+                    resetHoverState();
+                }
+            };
+
+            header.addEventListener('mouseenter', () => {
+                if (header.classList.contains('no-hover')) return;
+                if (resetTimeout) {
+                    clearTimeout(resetTimeout);
+                    resetTimeout = null;
+                }
+                // Track which clouds start running during hover
+                runningClouds.clear();
+                clouds.forEach(cloud => {
+                    cloud.addEventListener('animationstart', () => {
+                        runningClouds.add(cloud);
+                    }, { once: true });
+                });
+            });
+
+            header.addEventListener('mouseleave', () => {
+                activeClouds.clear();
+
+                // Use the tracked running clouds instead of checking computed style
+                // (which may already be paused due to CSS :hover being inactive)
+                clouds.forEach(cloud => {
+                    if (runningClouds.has(cloud)) {
+                        activeClouds.add(cloud);
+                        cloud.style.animationPlayState = 'running';
+                        cloud.style.opacity = '1';
+                        cloud.addEventListener('animationend', handleCloudEnd, { once: true });
+                    } else {
+                        cloud.style.opacity = '0';
+                    }
+                });
+                
+                runningClouds.clear();
+
+                if (activeClouds.size > 0) {
+                    header.classList.add('no-hover');
+                    // Safety: reset after max animation time (50s animation + 6s max delay = 56s)
+                    const maxDuration = 56000;
+                    resetTimeout = setTimeout(resetHoverState, maxDuration);
+                } else {
+                    resetHoverState();
+                }
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="container">
