@@ -62,15 +62,14 @@
 
         .header-title-wrapper {
             position: relative;
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 320px;
+            height: 180px;
             overflow: hidden;
-            border-radius: 50% 50% 40% 40% / 40% 40% 30% 30%;
-            padding: 1.5rem 3rem;
+            border-radius: 120px 120px 80px 80px / 80px 80px 60px 60px;
             background: transparent;
-        }
-
-        .header-title-wrapper:hover .cloud {
-            animation-play-state: running;
         }
 
         .cloud {
@@ -82,10 +81,18 @@
             animation: cloudPass 50s infinite;
             animation-play-state: paused;
             opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .header-title-wrapper:hover .cloud {
+            animation-play-state: running;
             opacity: 1;
+        }
+
+        /* Prevent re-trigger during wind-down */
+        .header-title-wrapper.no-hover:hover .cloud {
+            animation-play-state: paused !important;
+            opacity: 0 !important;
         }
 
         /* Prevent re-trigger during wind-down */
@@ -248,79 +255,89 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const header = document.querySelector('.header-title-wrapper');
-            if (!header) return;
+            const wrapper = document.querySelector('.header-title-wrapper');
+            if (!wrapper) return;
 
-            const clouds = header.querySelectorAll('.cloud');
-            let activeClouds = new Set();
+            const clouds = wrapper.querySelectorAll('.cloud');
+            let isAnimatingOut = false;
+            const activeClouds = new Set();
             let resetTimeout = null;
-            let runningClouds = new Set(); // Track clouds that are actually running
 
-            const resetHoverState = () => {
-                header.classList.remove('no-hover');
-                clouds.forEach(cloud => {
-                    cloud.style.removeProperty('animation-play-state');
-                    cloud.style.removeProperty('opacity');
-                });
-                activeClouds.clear();
-                if (resetTimeout) {
-                    clearTimeout(resetTimeout);
-                    resetTimeout = null;
-                }
+            const onCloudEnd = (event) => {
+                if (event.target.closest('.header-title-wrapper') !== wrapper) return;
+                finishCloud(event.target);
             };
 
-            const handleCloudEnd = (e) => {
-                const cloud = e.target;
+            const finishCloud = (cloud) => {
                 cloud.style.opacity = '0';
                 cloud.style.animationPlayState = 'paused';
+                cloud.style.animation = 'none';
                 activeClouds.delete(cloud);
+                cloud.removeEventListener('animationend', onCloudEnd);
 
                 if (activeClouds.size === 0) {
-                    resetHoverState();
+                    endWindDown();
                 }
             };
 
-            header.addEventListener('mouseenter', () => {
-                if (header.classList.contains('no-hover')) return;
+            const endWindDown = () => {
+                isAnimatingOut = false;
+                wrapper.classList.remove('no-hover');
                 if (resetTimeout) {
                     clearTimeout(resetTimeout);
                     resetTimeout = null;
                 }
-                // Track which clouds start running during hover
-                runningClouds.clear();
+
                 clouds.forEach(cloud => {
-                    cloud.addEventListener('animationstart', () => {
-                        runningClouds.add(cloud);
-                    }, { once: true });
+                    cloud.style.removeProperty('opacity');
+                    cloud.style.removeProperty('animation-play-state');
+                    cloud.style.animation = '';
                 });
+
+                activeClouds.clear();
+            };
+
+            wrapper.addEventListener('mouseenter', () => {
+                if (isAnimatingOut) return;
+                if (resetTimeout) {
+                    clearTimeout(resetTimeout);
+                    resetTimeout = null;
+                }
             });
 
-            header.addEventListener('mouseleave', () => {
+            wrapper.addEventListener('mouseleave', () => {
+                if (isAnimatingOut) return;
+
+                isAnimatingOut = true;
+                wrapper.classList.add('no-hover');
                 activeClouds.clear();
 
-                // Use the tracked running clouds instead of checking computed style
-                // (which may already be paused due to CSS :hover being inactive)
                 clouds.forEach(cloud => {
-                    if (runningClouds.has(cloud)) {
+                    const computed = window.getComputedStyle(cloud);
+                    const isRunning = computed.animationPlayState === 'running';
+                    const hasStarted = parseFloat(computed.opacity) > 0.1;
+
+                    if (isRunning || hasStarted) {
                         activeClouds.add(cloud);
-                        cloud.style.animationPlayState = 'running';
                         cloud.style.opacity = '1';
-                        cloud.addEventListener('animationend', handleCloudEnd, { once: true });
+                        cloud.style.animationPlayState = 'running';
+
+                        void cloud.offsetWidth; // force reflow
+
+                        cloud.addEventListener('animationend', onCloudEnd, { once: true });
                     } else {
                         cloud.style.opacity = '0';
+                        cloud.style.animationPlayState = 'paused';
                     }
                 });
-                
-                runningClouds.clear();
 
-                if (activeClouds.size > 0) {
-                    header.classList.add('no-hover');
-                    // Safety: reset after max animation time (50s animation + 6s max delay = 56s)
-                    const maxDuration = 56000;
-                    resetTimeout = setTimeout(resetHoverState, maxDuration);
-                } else {
-                    resetHoverState();
+                if (activeClouds.size === 0) {
+                    endWindDown();
+                    return;
                 }
+
+                // Safety timeout: 50s animation + 6s max delay = 56s
+                resetTimeout = setTimeout(endWindDown, 56000);
             });
         });
     </script>
