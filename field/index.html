@@ -62,18 +62,14 @@
 
         .header-title-wrapper {
             position: relative;
-            display: inline-block;
+            display: block;
             overflow: hidden;
-            border-radius: 50% / 40%;
+            border-radius: 50% 50% 50% 50% / 40% 40% 40% 40%;
             padding: 1.5rem 3rem;
             background: transparent;
         }
 
-        .header-title-wrapper:hover .cloud {
-            animation-play-state: running;
-        }
-
-        .cloud {
+        .header-title-wrapper .cloud {
             position: absolute;
             border-radius: 50%;
             pointer-events: none;
@@ -82,10 +78,17 @@
             animation: cloudPass 20s infinite;
             animation-play-state: paused;
             opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .header-title-wrapper:hover .cloud {
+        .header-title-wrapper:hover .cloud:not(.finishing) {
+            animation-play-state: running;
             opacity: 1;
+        }
+
+        .header-title-wrapper.no-hover:hover .cloud {
+            animation-play-state: paused !important;
+            opacity: 0 !important;
         }
 
         .cloud-1 {
@@ -280,6 +283,91 @@
             </section>
         </main>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const wrapper = document.querySelector('.header-title-wrapper');
+            if (!wrapper) return;
+
+            const clouds = wrapper.querySelectorAll('.cloud');
+            let isWindingDown = false;
+            let activeClouds = new Set();
+            let resetTimeout = null;
+
+            const finishCloud = (cloud) => {
+                cloud.classList.add('finishing');
+                cloud.style.opacity = '0';
+                cloud.style.animationPlayState = 'paused';
+                cloud.style.animation = 'none';
+                void cloud.offsetWidth;
+                cloud.style.animation = '';
+                activeClouds.delete(cloud);
+                cloud.classList.remove('finishing');
+                cloud.removeEventListener('animationend', onCloudEnd);
+
+                if (activeClouds.size === 0) {
+                    endWindDown();
+                }
+            };
+
+            const onCloudEnd = (event) => {
+                finishCloud(event.target);
+            };
+
+            const endWindDown = () => {
+                isWindingDown = false;
+                wrapper.classList.remove('no-hover');
+                if (resetTimeout) {
+                    clearTimeout(resetTimeout);
+                    resetTimeout = null;
+                }
+
+                clouds.forEach(cloud => {
+                    cloud.style.removeProperty('opacity');
+                    cloud.style.removeProperty('animation-play-state');
+                });
+
+                activeClouds.clear();
+            };
+
+            wrapper.addEventListener('mouseenter', () => {
+                if (isWindingDown) {
+                    endWindDown();
+                }
+                if (resetTimeout) {
+                    clearTimeout(resetTimeout);
+                    resetTimeout = null;
+                }
+            });
+
+            wrapper.addEventListener('mouseleave', () => {
+                if (isWindingDown) return;
+
+                isWindingDown = true;
+                wrapper.classList.add('no-hover');
+
+                setTimeout(() => {
+                    activeClouds.clear();
+
+                    clouds.forEach(cloud => {
+                        const computed = getComputedStyle(cloud);
+                        const isActive = computed.animationPlayState === 'running' || parseFloat(computed.opacity) > 0;
+
+                        if (isActive) {
+                            activeClouds.add(cloud);
+                            cloud.style.animationPlayState = 'running';
+                            cloud.style.opacity = '1';
+                            void cloud.offsetWidth;
+                            cloud.addEventListener('animationend', onCloudEnd, { once: true });
+                        } else {
+                            cloud.style.opacity = '0';
+                        }
+                    });
+
+                    resetTimeout = setTimeout(endWindDown, 15000);
+                }, 0);
+            });
+        });
+    </script>
 </body>
 </html>
 
