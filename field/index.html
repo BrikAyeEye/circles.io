@@ -298,11 +298,11 @@
                 'rgba(200, 220, 255, 0.28)'
             ];
 
-            // Special colors for milestone clouds
+            // Special colors for milestone clouds (more vibrant and visible)
             const specialColors = {
-                33: 'rgba(255, 255, 200, 0.5)',      // Light yellow
-                66: 'rgba(255, 200, 220, 0.5)',      // Light pink
-                99: 'rgba(200, 255, 240, 0.5)'       // Light green/turquoise
+                33: 'rgba(255, 255, 100, 0.8)',      // Bright yellow
+                66: 'rgba(255, 150, 200, 0.8)',      // Bright pink
+                99: 'rgba(100, 255, 220, 0.8)'       // Bright green/turquoise
             };
 
             let generatorActive = false;
@@ -334,8 +334,12 @@
                 const cloud = document.createElement('span');
                 cloud.className = 'cloud';
 
+                // Check if this is a milestone cloud
+                const isMilestone = cloudCount % 33 === 0;
+                
                 // Random properties
-                const size = randomItem(sizes);
+                // Make milestone clouds larger (use largest size)
+                const size = isMilestone ? sizes[2] : randomItem(sizes);
                 const speed = randomItem(speeds);
                 const color = getCloudColor(cloudCount);
                 const top = random(-30, 30); // Random vertical position
@@ -349,6 +353,11 @@
                 cloud.style.animation = `${speed.name} ${speed.duration} linear`;
                 cloud.style.animationDelay = `${delay}s`;
                 cloud.style.opacity = '1';
+                
+                // Make milestone clouds stand out more
+                if (isMilestone) {
+                    cloud.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.5)';
+                }
 
                 // Add to wrapper
                 wrapper.appendChild(cloud);
