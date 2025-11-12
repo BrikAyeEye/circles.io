@@ -298,23 +298,46 @@
                 'rgba(200, 220, 255, 0.28)'
             ];
 
+            // Special colors for milestone clouds
+            const specialColors = {
+                33: 'rgba(255, 255, 200, 0.5)',      // Light yellow
+                66: 'rgba(255, 200, 220, 0.5)',      // Light pink
+                99: 'rgba(200, 255, 240, 0.5)'       // Light green/turquoise
+            };
+
             let generatorActive = false;
             let spawnTimeout = null;
+            let hoverStartTimeout = null;
+            let cloudCount = 0;
 
             // Random helper functions
             const random = (min, max) => Math.random() * (max - min) + min;
             const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
             const randomItem = (array) => array[Math.floor(Math.random() * array.length)];
 
+            // Get color for cloud based on count
+            const getCloudColor = (count) => {
+                // Check milestones in order: 99 (green), 66 (pink), 33 (yellow)
+                if (count % 99 === 0) {
+                    return specialColors[99]; // Light green/turquoise
+                } else if (count % 66 === 0) {
+                    return specialColors[66]; // Light pink
+                } else if (count % 33 === 0) {
+                    return specialColors[33]; // Light yellow
+                }
+                return randomItem(colors);
+            };
+
             // Create and spawn a cloud
             const spawnCloud = () => {
+                cloudCount++;
                 const cloud = document.createElement('span');
                 cloud.className = 'cloud';
 
                 // Random properties
                 const size = randomItem(sizes);
                 const speed = randomItem(speeds);
-                const color = randomItem(colors);
+                const color = getCloudColor(cloudCount);
                 const top = random(-30, 30); // Random vertical position
                 const delay = random(0, 1);   // Random delay (0-1s)
 
@@ -355,14 +378,23 @@
                 spawnTimeout = setTimeout(generatorLoop, nextSpawn);
             };
 
-            // Start generator
+            // Start generator (with 2 second delay)
             wrapper.addEventListener('mouseenter', () => {
-                generatorActive = true;
-                generatorLoop(); // Start immediately
+                // Wait 2 seconds before starting
+                hoverStartTimeout = setTimeout(() => {
+                    generatorActive = true;
+                    generatorLoop(); // Start after delay
+                }, 2000);
             });
 
             // Stop generator
             wrapper.addEventListener('mouseleave', () => {
+                // Cancel hover delay if still waiting
+                if (hoverStartTimeout) {
+                    clearTimeout(hoverStartTimeout);
+                    hoverStartTimeout = null;
+                }
+                
                 generatorActive = false;
                 if (spawnTimeout) {
                     clearTimeout(spawnTimeout);
