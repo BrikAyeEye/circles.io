@@ -413,19 +413,41 @@ async function handleSend() {
 async function handleBirthData(text) {
     flowState.userBirthData = text;
     
-    // Echo something user wrote
-    const echoPhrase = extractEchoPhrase(text);
-    
-    await delay(1000);
-    await addAstraMessage(`so ${echoPhrase}...`);
-    await delay(getRandomDelay(CONFIG.textPause));
-    
-    // Reflect chart basics (simplified for prototype)
-    await addAstraMessage('looking at your chart');
-    await delay(getRandomDelay(CONFIG.textPause));
-    await addAstraMessage('what brings you here today?');
-    await delay(getRandomDelay(CONFIG.textPause));
-    await addAstraMessage('general curiosity, work, money, hobbies?');
+    // Use LLM to respond to birth data naturally
+    try {
+        const depthLevel = getRelationshipDepthLevel();
+        const conversationHistory = getRecentConversationHistory();
+        
+        const response = await fetch(`${BRIDGE_URL}/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_message: text,
+                relationship_depth: flowState.relationshipDepth,
+                depth_level: depthLevel.label,
+                conversation_history: conversationHistory
+            })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            await addAstraMessage(data.response);
+            flowState.sessionLog.push({
+                type: 'astra',
+                text: data.response,
+                stage: 'birthData-response',
+                timestamp: new Date().toISOString()
+            });
+            incrementRelationshipDepth();
+            saveSessionLog();
+        } else {
+            // Fallback to simple echo if API fails
+            await addAstraMessage(`so ${extractEchoPhrase(text)}...`);
+        }
+    } catch (error) {
+        console.error('Error generating birth data response:', error);
+        await addAstraMessage(`so ${extractEchoPhrase(text)}...`);
+    }
     
     flowState.stage = 'intent';
     await pauseBeforeNextInput();
@@ -435,10 +457,42 @@ async function handleBirthData(text) {
 async function handleIntent(text) {
     flowState.userIntent = text;
     
-    const echoPhrase = extractEchoPhrase(text);
+    // Use LLM to acknowledge intent naturally before moving to houses
+    try {
+        const depthLevel = getRelationshipDepthLevel();
+        const conversationHistory = getRecentConversationHistory();
+        
+        const response = await fetch(`${BRIDGE_URL}/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_message: text,
+                relationship_depth: flowState.relationshipDepth,
+                depth_level: depthLevel.label,
+                conversation_history: conversationHistory
+            })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            await addAstraMessage(data.response);
+            flowState.sessionLog.push({
+                type: 'astra',
+                text: data.response,
+                stage: 'intent-response',
+                timestamp: new Date().toISOString()
+            });
+            incrementRelationshipDepth();
+            saveSessionLog();
+        } else {
+            // Fallback
+            await addAstraMessage(`${extractEchoPhrase(text)}, got it`);
+        }
+    } catch (error) {
+        console.error('Error generating intent response:', error);
+        await addAstraMessage(`${extractEchoPhrase(text)}, got it`);
+    }
     
-    await delay(1000);
-    await addAstraMessage(`${echoPhrase}, got it`);
     await delay(getRandomDelay(CONFIG.textPause));
     
     // Start probing core triangle
