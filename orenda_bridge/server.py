@@ -392,6 +392,10 @@ def chat():
         
         reply = response.choices[0].message.content
         
+        # Clean up markdown links - convert [text](url) to just "text (url)" for plain text display
+        import re
+        reply = re.sub(r'\[([^\]]+)\]\(([^\)]+)\)', r'\1 (\2)', reply)
+        
         return jsonify({
             "success": True,
             "response": reply
