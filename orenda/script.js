@@ -319,26 +319,8 @@ async function handleIntroOption(option) {
     });
     saveSessionLog();
     
-    const guidanceLines = [
-        "hand me your birth data (date, time, place) when you're ready.",
-        "or just start with whatever work or money knot is tugging right now."
-    ];
-    
-    for (let i = 0; i < guidanceLines.length; i++) {
-        await addAstraMessage(guidanceLines[i]);
-        flowState.sessionLog.push({
-            type: 'astra',
-            text: guidanceLines[i],
-            stage: 'intro-guidance',
-            timestamp: new Date().toISOString()
-        });
-        saveSessionLog();
-        if (i < guidanceLines.length - 1) {
-            await delay(getRandomDelay(CONFIG.textPause));
-        }
-    }
-    
-    flowState.stage = 'birthData';
+    // No more canned guidance - LLM will guide them after first user input
+    flowState.stage = 'gatheringBirthData';  // LLM handles everything from here
     if (flowState.relationshipDepth === 0) {
         flowState.relationshipDepth = 1;
     }
@@ -398,7 +380,9 @@ async function handleSend() {
     disableInput();
     
     // Process based on flow stage
-    if (flowState.stage === 'birthData') {
+    if (flowState.stage === 'gatheringBirthData') {
+        await handleGatheringBirthData(text);
+    } else if (flowState.stage === 'birthData') {
         await handleBirthData(text);
     } else if (flowState.stage === 'intent') {
         await handleIntent(text);
@@ -409,7 +393,62 @@ async function handleSend() {
     }
 }
 
-// Handle birth data input
+// Handle gathering birth data - LLM guides user to provide DOB/place/time
+async function handleGatheringBirthData(text) {
+    // Check if text looks like birth data (date, or mentions date/time/place)
+    const looksLikeBirthData = /(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})|(born|birth|dob|date of birth|time|place|location)/i.test(text);
+    
+    if (looksLikeBirthData) {
+        // User provided birth data, extract and move forward
+        flowState.userBirthData = text;
+        flowState.stage = 'birthData';
+        await handleBirthData(text);
+        return;
+    }
+    
+    // Otherwise, use LLM to guide them toward providing birth data
+    try {
+        const depthLevel = getRelationshipDepthLevel();
+        const conversationHistory = getRecentConversationHistory();
+        
+        // Add context hint about the goal
+        const guidedMessage = `${text}\n\n[Context: Your goal is to guide the user to provide their birth data (date of birth, time if known, and place/city). You can ask for it directly, or suggest they get it from https://astro.cafeastrology.com/natal.php if they prefer. Be natural and conversational - don't sound like a form.]`;
+        
+        const response = await fetch(`${BRIDGE_URL}/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_message: guidedMessage,
+                relationship_depth: flowState.relationshipDepth,
+                depth_level: depthLevel.label,
+                conversation_history: conversationHistory
+            })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            await addAstraMessage(data.response);
+            flowState.sessionLog.push({
+                type: 'astra',
+                text: data.response,
+                stage: 'gatheringBirthData-response',
+                timestamp: new Date().toISOString()
+            });
+            incrementRelationshipDepth();
+            saveSessionLog();
+        } else {
+            // Fallback
+            await addAstraMessage(`i hear you. to get started, i'll need your birth data - date, time if you know it, and place. or you can grab it from cafeastrology.com and paste it here.`);
+        }
+    } catch (error) {
+        console.error('Error generating gathering birth data response:', error);
+        await addAstraMessage(`i hear you. to get started, i'll need your birth data - date, time if you know it, and place.`);
+    }
+    
+    await pauseBeforeNextInput();
+}
+
+// Handle birth data input (after we've confirmed they provided it)
 async function handleBirthData(text) {
     flowState.userBirthData = text;
     
