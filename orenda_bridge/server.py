@@ -366,6 +366,37 @@ def chat():
         if user_style:
             style_context = f"\n\nUser communication style: {user_style}. Match their pace and style - if they're direct, be direct. If they're slow/evasive, slow down and be more gentle."
         
+        # Detect astro knowledge level
+        from memory.astro_knowledge_tracker import (
+            detect_astro_knowledge, 
+            build_knowledge_context,
+            should_ask_knowledge_question
+        )
+        
+        # Get existing level from profile if available
+        profile = profile_store.get_profile(user_id) if user_id else None
+        existing_level = profile.get("astro_knowledge_level") if profile else None
+        
+        # Detect from current message
+        detected_level = detect_astro_knowledge(user_message, conversation_history)
+        
+        # Use detected level if higher than existing (user might be learning)
+        if detected_level is not None:
+            if existing_level is None or detected_level > existing_level:
+                current_level = detected_level
+                # Save to profile
+                profile_store.save_profile(user_id, astro_knowledge_level=detected_level)
+            else:
+                current_level = existing_level
+        else:
+            current_level = existing_level
+        
+        # Build knowledge context for prompt
+        knowledge_context = build_knowledge_context(current_level)
+        
+        # Check if we should ask about knowledge
+        should_ask = should_ask_knowledge_question(current_level, relationship_depth)
+        
         # Get research hints (archetypes + methods) - lightweight, no embeddings
         research_hints = _get_research_hints(user_message, limit=2)
         
@@ -378,11 +409,16 @@ def chat():
             hints=research_hints
         )
         
-        # Add depth context and style context to system message
+        # Add depth context, style context, and knowledge context to system message
         if messages and messages[0]['role'] == 'system':
             messages[0]['content'] += f"\n\n{depth_context}"
             if style_context:
                 messages[0]['content'] += style_context
+            if knowledge_context:
+                messages[0]['content'] += knowledge_context
+            # If we should ask about knowledge, add a hint (but don't force it)
+            if should_ask and relationship_depth >= 3:
+                messages[0]['content'] += "\n\n[Optional: If it feels natural, you could gently ask about their astro background (e.g., 'do you know what the houses stand for?' or 'how familiar are you with astrology?'). But don't force it - only if it flows naturally.]"
         
         response = bridge.llm_client.chat.complete(
             model=bridge.model,

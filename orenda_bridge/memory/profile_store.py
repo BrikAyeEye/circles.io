@@ -25,7 +25,7 @@ class ProfileStore:
     
     def save_profile(self, user_id: str, chart: Optional[Dict] = None, 
                      themes: Optional[list] = None, tone_preference: Optional[str] = None,
-                     session_summary: Optional[str] = None) -> bool:
+                     session_summary: Optional[str] = None, astro_knowledge_level: Optional[int] = None) -> bool:
         """
         Save or update a user profile.
         
@@ -35,6 +35,7 @@ class ProfileStore:
             themes: List of top themes/interests (e.g., ["career", "money", "location"])
             tone_preference: Preferred communication style (e.g., "soft", "direct", "playful")
             session_summary: Compact summary of recent session insights
+            astro_knowledge_level: Astrological knowledge level (1-10 scale)
         
         Returns:
             True if saved successfully
@@ -50,13 +51,24 @@ class ProfileStore:
             except (json.JSONDecodeError, IOError):
                 existing = {}
         
-        # Merge new data
+        # Merge new data (only update astro_knowledge_level if provided and higher than existing)
+        existing_level = existing.get("astro_knowledge_level")
+        if astro_knowledge_level is not None:
+            # Use the higher level (user might be learning)
+            if existing_level is None or astro_knowledge_level > existing_level:
+                final_level = astro_knowledge_level
+            else:
+                final_level = existing_level
+        else:
+            final_level = existing_level
+        
         profile = {
             "user_id": user_id,
             "chart": chart or existing.get("chart"),
             "themes": themes or existing.get("themes", []),
             "tone_preference": tone_preference or existing.get("tone_preference"),
             "session_summary": session_summary or existing.get("session_summary"),
+            "astro_knowledge_level": final_level,
             "last_updated": datetime.now().isoformat(),
             "created_at": existing.get("created_at", datetime.now().isoformat())
         }
