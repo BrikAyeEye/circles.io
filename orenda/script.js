@@ -411,8 +411,8 @@ async function handleGatheringBirthData(text) {
         const depthLevel = getRelationshipDepthLevel();
         const conversationHistory = getRecentConversationHistory();
         
-        // Add context hint about the goal
-        const guidedMessage = `${text}\n\n[Context: Your goal is to guide the user to provide their birth data (date of birth, time if known, and place/city). You can ask for it directly, or suggest they get it from https://astro.cafeastrology.com/natal.php if they prefer. Be natural and conversational - don't sound like a form.]`;
+        // Add context hint about the goal - keep it light and casual
+        const guidedMessage = `${text}\n\n[Context: Your goal is to guide the user to provide their birth data (date of birth, time if known, and place/city). You can ask for it directly, or suggest they get it from https://astro.cafeastrology.com/natal.php if they prefer. Be natural and conversational - don't sound like a form. Keep it SHORT and LIGHT - no deep astro analysis yet, just friendly guidance.]`;
         
         const response = await fetch(`${BRIDGE_URL}/chat`, {
             method: 'POST',

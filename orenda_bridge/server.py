@@ -354,9 +354,9 @@ def chat():
         # Adjust prompt based on relationship depth
         depth_context = f"Relationship depth: {depth_level} ({relationship_depth} exchanges). "
         if relationship_depth <= 5:
-            depth_context += "Keep responses LIGHT and SLOW. Surface-level observations only. NO questions. Keep it SHORT (2-3 lines max). Just notice, reflect, observe. Don't dive deep yet. This is the 'getting to know you' phase - take it slow."
+            depth_context += "Keep responses LIGHT and SLOW. Surface-level observations only. NO technical astro jargon (no degrees, no exact aspects, no house cusps). NO questions. Keep it SHORT (2-3 lines max). Just notice, reflect, observe. Don't dive deep yet. This is the 'getting to know you' phase - take it slow. Speak like a human, not a textbook."
         elif relationship_depth <= 15:
-            depth_context += "Gradually deepening, but still building rapport. Can explore more, but keep it measured. Maximum ONE question per response, and only if it naturally emerges."
+            depth_context += "Gradually deepening, but still building rapport. Can explore more, but keep it measured. Avoid heavy technical details (degrees, exact aspects) unless user asks. Maximum ONE question per response, and only if it naturally emerges."
         else:
             depth_context += "Deep relationship established. Full mythic/archetypal depth appropriate. Give clean, accurate, specific interpretations of what their chart actually says - avoid generic phrases. Questions are rare - let observations stand on their own. Maximum ONE question per response."
         
